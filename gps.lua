@@ -30,10 +30,10 @@ local function getGpsData()
 end
 
 local function openGpsTrackFile()
+    -- Datei immer sofort öffnen, ohne GPS-Prüfung
     local timestamp = getDateTime()
     local modelInfo = model.getInfo()
     local modelName = modelInfo and modelInfo.name or "UnknownModel"
-    -- Ersetze Leerzeichen und ungültige Zeichen im Modelnamen
     modelName = string.gsub(modelName, "[^%w_%-]", "_")
     local fname = string.format("/LOGS/%s_gps_track_%04d%02d%02d_%02d%02d%02d.csv",
         modelName,
@@ -66,6 +66,11 @@ local function logGpsSample()
     if not gpsTrackFile then return end
     local gps = getGpsData()
     if gps then
+        local lat = gps.lat or 0
+        local lon = gps.lon or 0
+        -- Prüfe, ob Koordinaten plausibel sind
+        if lat == 0 or lon == 0 then return end
+
         local time_us = getTime() * 10000 -- getTime() in 1/100s, convert to us
 
         -- Satelliten, Höhe, Geschwindigkeit holen
@@ -79,11 +84,12 @@ local function logGpsSample()
             end
         end
 
+        -- Prüfe, ob Satellitenanzahl sinnvoll ist (z.B. mindestens 3)
+        if numSat < 3 then return end
+
         local alt = getValue(gpsAltId) or 0
         local speed = getValue(gpsSpeedId) or 0
         -- Geschwindigkeit ggf. in m/s lassen (wie im Header)
-        local lat = gps.lat or 0
-        local lon = gps.lon or 0
         local course = gps.course or 0
 
         local line = string.format("%d,%d,%.7f,%.7f,%d,%.2f,%.1f\r\n",
@@ -95,11 +101,14 @@ end
 local function run(event)
     if not gpsTrackFile then
         openGpsTrackFile()
-        flightStartTime = getTime()
-        lastLogTick = getTime()
+        -- Nur wenn Datei wirklich geöffnet wurde, Startzeit setzen
+        if gpsTrackFile then
+            flightStartTime = getTime()
+            lastLogTick = getTime()
+        end
     end
     local now = getTime()
-    if now - lastLogTick >= 100 then -- 100 Ticks = 1000 ms
+    if gpsTrackFile and now - lastLogTick >= 100 then -- 100 Ticks = 1000 ms
         logGpsSample()
         lastLogTick = now
     end
