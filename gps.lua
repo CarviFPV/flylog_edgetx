@@ -6,6 +6,7 @@ local lastLogTick = 0
 local gpsSatId = -1
 local gpsAltId = -1
 local gpsSpeedId = -1
+local gpsHeadingId = -1 -- Add heading ID variable
 
 -- Hilfsfunktion zum Abrufen der Telemetrie-ID für einen bestimmten Sensor
 local function getTelemetryId(name)
@@ -50,6 +51,7 @@ local function openGpsTrackFile()
     gpsSatId = getTelemetryId("Sats")
     gpsAltId = getTelemetryId("Alt")
     gpsSpeedId = getTelemetryId("GSpd")
+    gpsHeadingId = getTelemetryId("Hdg") -- Get the heading telemetry ID
     -- Fallbacks wie in main.lua
     if gpsAltId == -1 then gpsAltId = getTelemetryId("GAlt") end
     if gpsSatId == -1 then gpsSatId = getTelemetryId("Tmp2") end
@@ -89,8 +91,12 @@ local function logGpsSample()
 
         local alt = getValue(gpsAltId) or 0
         local speed = getValue(gpsSpeedId) or 0
-        -- Geschwindigkeit ggf. in m/s lassen (wie im Header)
-        local course = gps.course or 0
+        -- Use the heading telemetry value instead of GPS course
+        local course = getValue(gpsHeadingId) or 0
+        -- Fall back to GPS course if heading telemetry is not available
+        if course == 0 and gps.course then
+            course = gps.course
+        end
 
         local line = string.format("%d,%d,%.7f,%.7f,%d,%.2f,%.1f\r\n",
             time_us, numSat, lat, lon, alt, speed, course)
