@@ -1,9 +1,8 @@
 local logFile = "/LOGS/flylog.csv"
 local flightStartTime = 0
-local armed = 0          -- 0 means disarmed; non-zero means armed
-local armingDetails = {} -- Table to store arming event details
+local armed = 0
+local armingDetails = {}
 
--- Hilfsfunktion zum Abrufen der Telemetrie-ID für einen bestimmten Sensor
 local function getTelemetryId(name)
     local field = getFieldInfo(name)
     if field then
@@ -13,7 +12,6 @@ local function getTelemetryId(name)
     end
 end
 
--- Funktion zum Abrufen der GPS-Koordinaten anhand der Telemetrie-ID "GPS"
 local function getGpsCoordinates()
     local gpsId = getTelemetryId("GPS")
     if gpsId ~= -1 then
@@ -32,7 +30,6 @@ local function init()
     if not file then
         file = io.open(logFile, "a")
         if file then
-            -- Kopfzeile inkl. zusätzlicher Spalten für GPS-Koordinaten
             io.write(file,
                 "Arming,Date,Timestamp-TO,GPS-Arming-Lat,GPS-Arming-Lon,Disarming,Timestamp-LDG,GPS-Disarming-Lat,GPS-Disarming-Lon,Duration,ModelName\r\n")
             io.close(file)

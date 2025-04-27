@@ -16,8 +16,11 @@ local capaId = -1
 local rQlyId = -1
 local tQlyId = -1
 local tPwrId = -1
+local ailId = -1
+local eleId = -1
+local thrId = -1
+local rudId = -1
 
--- Hilfsfunktion zum Abrufen der Telemetrie-ID für einen bestimmten Sensor
 local function getTelemetryId(name)
     local field = getFieldInfo(name)
     if field then
@@ -27,7 +30,6 @@ local function getTelemetryId(name)
     end
 end
 
--- GPS-Daten abrufen
 local function getGpsData()
     local gpsId = getTelemetryId("GPS")
     if gpsId ~= -1 then
@@ -40,7 +42,6 @@ local function getGpsData()
 end
 
 local function openGpsTrackFile()
-    -- Datei immer sofort öffnen, ohne GPS-Prüfung
     local timestamp = getDateTime()
     local modelInfo = model.getInfo()
     local modelName = modelInfo and modelInfo.name or "UnknownModel"
@@ -53,10 +54,9 @@ local function openGpsTrackFile()
     gpsTrackFile = io.open(fname, "w")
     if gpsTrackFile then
         io.write(gpsTrackFile,
-            "time,GPS_numSat,GPS_coord[0],GPS_coord[1],GPS_altitude,GPS_speed,GPS_ground_course,VSpd,Pitch,Roll,Yaw,RxBt,Curr,Capa,RQly,TQly,TPWR\r\n")
+            "time,GPS_numSat,GPS_coord[0],GPS_coord[1],GPS_altitude,GPS_speed,GPS_ground_course,VSpd,Pitch,Roll,Yaw,RxBt,Curr,Capa,RQly,TQly,TPWR,Ail,Ele,Thr,Rud\r\n")
     end
 
-    -- Telemetrie-IDs ermitteln
     gpsSatId = getTelemetryId("Sats")
     gpsAltId = getTelemetryId("Alt")
     gpsSpeedId = getTelemetryId("GSpd")
@@ -71,9 +71,19 @@ local function openGpsTrackFile()
     rQlyId = getTelemetryId("RQly")
     tQlyId = getTelemetryId("TQly")
     tPwrId = getTelemetryId("TPWR")
-    -- Fallbacks wie in main.lua
+
     if gpsAltId == -1 then gpsAltId = getTelemetryId("GAlt") end
     if gpsSatId == -1 then gpsSatId = getTelemetryId("Tmp2") end
+
+    ailId = getTelemetryId("ail")
+    eleId = getTelemetryId("ele")
+    thrId = getTelemetryId("thr")
+    rudId = getTelemetryId("rud")
+
+    if ailId == -1 then ailId = getTelemetryId("a") end
+    if eleId == -1 then eleId = getTelemetryId("e") end
+    if thrId == -1 then thrId = getTelemetryId("t") end
+    if rudId == -1 then rudId = getTelemetryId("r") end
 end
 
 local function closeGpsTrackFile()
@@ -86,24 +96,20 @@ end
 local function logGpsSample()
     if not gpsTrackFile then return end
     local gps = getGpsData()
-    
-    local time_us = getTime() * 10000 -- getTime() in 1/100s, convert to us
 
-    -- Default-Werte setzen, falls keine GPS-Daten vorhanden
+    local time_us = getTime() * 10000
+
     local lat = 0
     local lon = 0
     local numSat = 0
-    
-    -- GPS-Daten übernehmen wenn vorhanden
+
     if gps then
         lat = gps.lat or 0
         lon = gps.lon or 0
     end
 
-    -- Satelliten, Höhe, Geschwindigkeit holen
     numSat = getValue(gpsSatId) or 0
     if type(numSat) == "string" then
-        -- wie in main.lua: Sats kann als String kommen, dann extrahieren
         if #numSat > 2 then
             numSat = tonumber(string.sub(numSat, 3, 6)) or 0
         else
@@ -113,47 +119,48 @@ local function logGpsSample()
 
     local alt = getValue(gpsAltId) or 0
     local speed = getValue(gpsSpeedId) or 0
-    -- Use the heading telemetry value instead of GPS course
     local course = getValue(gpsHeadingId) or 0
-    -- Fall back to GPS course if heading telemetry is not available
+
     if course == 0 and gps and gps.course then
         course = gps.course
     end
 
-    -- Get vertical speed
     local vSpeed = getValue(vSpeedId) or 0
 
-    -- Get attitude data
     local pitch = getValue(pitchId) or 0
     local roll = getValue(rollId) or 0
     local yaw = getValue(yawId) or 0
 
-    -- Get battery and current data
     local rxBt = getValue(rxBtId) or 0
     local curr = getValue(currId) or 0
     local capa = getValue(capaId) or 0
 
-    -- Get link quality data
     local rQly = getValue(rQlyId) or 0
     local tQly = getValue(tQlyId) or 0
     local tPwr = getValue(tPwrId) or 0
 
-    local line = string.format("%d,%d,%.7f,%.7f,%d,%.2f,%.1f,%.2f,%.1f,%.1f,%.1f,%.2f,%.2f,%d,%d,%d,%d\r\n",
-        time_us, numSat, lat, lon, alt, speed, course, vSpeed, pitch, roll, yaw, rxBt, curr, capa, rQly, tQly, tPwr)
+    local aileron = getValue(ailId) or 0
+    local elevator = getValue(eleId) or 0
+    local throttle = getValue(thrId) or 0
+    local rudder = getValue(rudId) or 0
+
+    local line = string.format(
+        "%d,%d,%.7f,%.7f,%d,%.2f,%.1f,%.2f,%.1f,%.1f,%.1f,%.2f,%.2f,%d,%d,%d,%d,%.2f,%.2f,%.2f,%.2f\r\n",
+        time_us, numSat, lat, lon, alt, speed, course, vSpeed, pitch, roll, yaw, rxBt, curr, capa, rQly, tQly, tPwr,
+        aileron, elevator, throttle, rudder)
     io.write(gpsTrackFile, line)
 end
 
 local function run(event)
     if not gpsTrackFile then
         openGpsTrackFile()
-        -- Nur wenn Datei wirklich geöffnet wurde, Startzeit setzen
         if gpsTrackFile then
             flightStartTime = getTime()
             lastLogTick = getTime()
         end
     end
     local now = getTime()
-    if gpsTrackFile and now - lastLogTick >= 80 then -- 80 Ticks = 800 ms
+    if gpsTrackFile and now - lastLogTick >= 35 then
         logGpsSample()
         lastLogTick = now
     end
@@ -166,7 +173,6 @@ local function background(event)
 end
 
 local function init()
-    -- Keine Initialisierung nötig
 end
 
 return { init = init, run = run, background = background }
