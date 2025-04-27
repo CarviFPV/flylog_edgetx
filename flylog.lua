@@ -33,7 +33,8 @@ local function init()
         file = io.open(logFile, "a")
         if file then
             -- Kopfzeile inkl. zusätzlicher Spalten für GPS-Koordinaten
-            io.write(file, "Arming,Date,Timestamp-TO,GPS-Arming-Lat,GPS-Arming-Lon,Disarming,Timestamp-LDG,GPS-Disarming-Lat,GPS-Disarming-Lon,Duration,ModelName\r\n")
+            io.write(file,
+                "Arming,Date,Timestamp-TO,GPS-Arming-Lat,GPS-Arming-Lon,Disarming,Timestamp-LDG,GPS-Disarming-Lat,GPS-Disarming-Lon,Duration,ModelName\r\n")
             io.close(file)
         else
             error("Could not create log file!")
@@ -46,20 +47,20 @@ end
 local function logEvent(event, duration)
     local file = io.open(logFile, "a")
     if file then
-        local timestamp = getDateTime()
-        local year = timestamp.year or 0
-        local mon  = timestamp.mon or 0
-        local day  = timestamp.day or 0
-        local hour = timestamp.hour or 0
-        local min  = timestamp.min or 0
-        local sec  = timestamp.sec or 0
+        local timestamp    = getDateTime()
+        local year         = timestamp.year or 0
+        local mon          = timestamp.mon or 0
+        local day          = timestamp.day or 0
+        local hour         = timestamp.hour or 0
+        local min          = timestamp.min or 0
+        local sec          = timestamp.sec or 0
 
-        local dateStr = string.format("%04d-%02d-%02d", year, mon, day)
-        local timeStr = string.format("%02d:%02d:%02d", hour, min, sec)
+        local dateStr      = string.format("%04d-%02d-%02d", year, mon, day)
+        local timeStr      = string.format("%02d:%02d:%02d", hour, min, sec)
         local safeDuration = duration or 0
 
-        local modelInfo = model.getInfo()
-        local modelName = modelInfo and modelInfo.name or "Unknown Model"
+        local modelInfo    = model.getInfo()
+        local modelName    = modelInfo and modelInfo.name or "Unknown Model"
 
         if event == "Arming" then
             local lat, lon = getGpsCoordinates()
@@ -87,7 +88,7 @@ local function logEvent(event, duration)
                 armingDetails.modelName)
             io.write(file, logLine)
             io.close(file)
-            print("Logged:", logLine) -- Debug-Ausgabe
+            print("Logged:", logLine)
         end
     else
         error("Could not open log file for writing!")

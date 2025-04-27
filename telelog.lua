@@ -86,59 +86,61 @@ end
 local function logGpsSample()
     if not gpsTrackFile then return end
     local gps = getGpsData()
+    
+    local time_us = getTime() * 10000 -- getTime() in 1/100s, convert to us
+
+    -- Default-Werte setzen, falls keine GPS-Daten vorhanden
+    local lat = 0
+    local lon = 0
+    local numSat = 0
+    
+    -- GPS-Daten übernehmen wenn vorhanden
     if gps then
-        local lat = gps.lat or 0
-        local lon = gps.lon or 0
-        -- Prüfe, ob Koordinaten plausibel sind
-        if lat == 0 or lon == 0 then return end
-
-        local time_us = getTime() * 10000 -- getTime() in 1/100s, convert to us
-
-        -- Satelliten, Höhe, Geschwindigkeit holen
-        local numSat = getValue(gpsSatId) or 0
-        if type(numSat) == "string" then
-            -- wie in main.lua: Sats kann als String kommen, dann extrahieren
-            if #numSat > 2 then
-                numSat = tonumber(string.sub(numSat, 3, 6)) or 0
-            else
-                numSat = tonumber(string.sub(numSat, 0, 3)) or 0
-            end
-        end
-
-        -- Prüfe, ob Satellitenanzahl sinnvoll ist (z.B. mindestens 3)
-        if numSat < 3 then return end
-
-        local alt = getValue(gpsAltId) or 0
-        local speed = getValue(gpsSpeedId) or 0
-        -- Use the heading telemetry value instead of GPS course
-        local course = getValue(gpsHeadingId) or 0
-        -- Fall back to GPS course if heading telemetry is not available
-        if course == 0 and gps.course then
-            course = gps.course
-        end
-
-        -- Get vertical speed
-        local vSpeed = getValue(vSpeedId) or 0
-
-        -- Get attitude data
-        local pitch = getValue(pitchId) or 0
-        local roll = getValue(rollId) or 0
-        local yaw = getValue(yawId) or 0
-
-        -- Get battery and current data
-        local rxBt = getValue(rxBtId) or 0
-        local curr = getValue(currId) or 0
-        local capa = getValue(capaId) or 0
-
-        -- Get link quality data
-        local rQly = getValue(rQlyId) or 0
-        local tQly = getValue(tQlyId) or 0
-        local tPwr = getValue(tPwrId) or 0
-
-        local line = string.format("%d,%d,%.7f,%.7f,%d,%.2f,%.1f,%.2f,%.1f,%.1f,%.1f,%.2f,%.2f,%d,%d,%d,%d\r\n",
-            time_us, numSat, lat, lon, alt, speed, course, vSpeed, pitch, roll, yaw, rxBt, curr, capa, rQly, tQly, tPwr)
-        io.write(gpsTrackFile, line)
+        lat = gps.lat or 0
+        lon = gps.lon or 0
     end
+
+    -- Satelliten, Höhe, Geschwindigkeit holen
+    numSat = getValue(gpsSatId) or 0
+    if type(numSat) == "string" then
+        -- wie in main.lua: Sats kann als String kommen, dann extrahieren
+        if #numSat > 2 then
+            numSat = tonumber(string.sub(numSat, 3, 6)) or 0
+        else
+            numSat = tonumber(string.sub(numSat, 0, 3)) or 0
+        end
+    end
+
+    local alt = getValue(gpsAltId) or 0
+    local speed = getValue(gpsSpeedId) or 0
+    -- Use the heading telemetry value instead of GPS course
+    local course = getValue(gpsHeadingId) or 0
+    -- Fall back to GPS course if heading telemetry is not available
+    if course == 0 and gps and gps.course then
+        course = gps.course
+    end
+
+    -- Get vertical speed
+    local vSpeed = getValue(vSpeedId) or 0
+
+    -- Get attitude data
+    local pitch = getValue(pitchId) or 0
+    local roll = getValue(rollId) or 0
+    local yaw = getValue(yawId) or 0
+
+    -- Get battery and current data
+    local rxBt = getValue(rxBtId) or 0
+    local curr = getValue(currId) or 0
+    local capa = getValue(capaId) or 0
+
+    -- Get link quality data
+    local rQly = getValue(rQlyId) or 0
+    local tQly = getValue(tQlyId) or 0
+    local tPwr = getValue(tPwrId) or 0
+
+    local line = string.format("%d,%d,%.7f,%.7f,%d,%.2f,%.1f,%.2f,%.1f,%.1f,%.1f,%.2f,%.2f,%d,%d,%d,%d\r\n",
+        time_us, numSat, lat, lon, alt, speed, course, vSpeed, pitch, roll, yaw, rxBt, curr, capa, rQly, tQly, tPwr)
+    io.write(gpsTrackFile, line)
 end
 
 local function run(event)
