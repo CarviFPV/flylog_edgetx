@@ -160,7 +160,7 @@ local function run(event)
         end
     end
     local now = getTime()
-    if gpsTrackFile and now - lastLogTick >= 35 then
+    if gpsTrackFile and now - lastLogTick >= 15 then
         logGpsSample()
         lastLogTick = now
     end
