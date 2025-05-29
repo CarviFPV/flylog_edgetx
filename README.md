@@ -1,20 +1,35 @@
-# FlyLog - A Simple Logging Script for EdgeTX
+# FlyLog & TeleLog - Logging Scripts for EdgeTX
 
-This script logs the arming and disarming events of your model, along with date/time, GPS coordinates, and the model name. It is intended for use on EdgeTX-based transmitters.
+This repository contains two Lua scripts for EdgeTX transmitters:
+
+- **flylog.lua**: Logs arming/disarming events, timestamps, GPS coordinates, and model name.
+- **tellog.lua**: Logs detailed telemetry data at regular intervals during flight.
 
 ## Features
+
+### flylog.lua
 
 - Logs arming and disarming events
 - Records date, time, GPS coordinates, and model name
 - Creates a CSV log file (`/LOGS/flylog.csv`) if it doesn't exist
 - Easy setup using the EdgeTX "Special Functions" menu
 
+### tellog.lua
+
+- Logs detailed telemetry data at regular intervals (about every 0.43 seconds, i.e., 3.5 times per second by default; this interval can be changed in the script)
+- Records GPS, altitude, speed, heading, pitch, roll, yaw, battery, current, capacity, quality, stick positions, and more
+- Creates a CSV log file per flight in `/LOGS/`, named with the model and timestamp
+- Useful for post-flight analysis and visualization
+
 ## Installation
+
+### flylog.lua
 
 1. **Download/Obtain the Script**  
    Save the `flylog.lua` file into the `SCRIPTS/FUNCTIONS` directory on your EdgeTX SD card.
 
-2. **Configure the Script in EdgeTX**  
+2. **Configure the Script in EdgeTX**
+
    1. On your EdgeTX transmitter, open the **Model** page and navigate to the **Special Functions** tab.
    2. Create a new special function (tap the `+` icon).
    3. Under **Trigger**, select the switch you want to use to start/stop logging (e.g., your arming switch).
@@ -25,33 +40,95 @@ This script logs the arming and disarming events of your model, along with date/
 
    Refer to the provided screenshots for an example of how this is set up.
 
+### tellog.lua
+
+1. **Download/Obtain the Script**  
+   Save the `tellog.lua` file into the `SCRIPTS/FUNCTIONS` directory on your EdgeTX SD card.
+
+2. **Configure the Script in EdgeTX**  
+   The setup is the same as for `flylog.lua`:
+
+   1. On your EdgeTX transmitter, open the **Model** page and navigate to the **Special Functions** tab.
+   2. Create a new special function (tap the `+` icon).
+   3. Under **Trigger**, select the switch you want to use to start/stop logging (e.g., your arming switch).
+   4. Under **Function**, choose **Lua Script**.
+   5. Under **Value**, select `tellog.lua`.
+   6. Set **Repeat** to **ON**.
+   7. Make sure **Enable** is toggled on.
+
+   Refer to the provided screenshots for an example of how this is set up.
+
 ## Usage
+
+### flylog.lua
 
 - **Arming**: When you toggle your chosen switch from the disarmed state to the armed state, the script will log the "Arming" event, along with the current date/time, and the GPS coordinates at arming.
 - **Disarming**: When you toggle the switch back to disarmed, the script logs the "Disarming" event, along with the disarming date/time, GPS coordinates, and the total duration (in seconds) of the armed flight.
 
 After each flight, a new line will be added to the `flylog.csv` file in your transmitter’s `LOGS` folder.
 
-## Log File Format
+### tellog.lua
 
-The CSV file (`flylog.csv`) now contains the following columns:
+- When active, the script creates a new CSV file in `/LOGS/` for each session, named like `<ModelName>_TeleLog_<YYYYMMDD>_<HHMMSS>.csv`.
+- About every 0.43 seconds (every 15 ticks, see the `if gpsTrackFile and now - lastLogTick >= 15 then` line in the script to adjust this interval), it logs a row with the current telemetry values.
+- Stop the script or power off to close the log file.
 
+## Log File Formats
+
+### flylog.lua
+
+The CSV file (`flylog.csv`) contains the following columns:
+
+```
 Arming,Date,Timestamp-TO,GPS-Arming-Lat,GPS-Arming-Lon,Disarming,Timestamp-LDG,GPS-Disarming-Lat,GPS-Disarming-Lon,Duration,ModelName
+```
 
 Each row corresponds to a single flight:
+
 - **Arming**: A constant text field ("Arming").
 - **Date**: The flight date in `YYYY-MM-DD` format.
 - **Timestamp-TO**: The arming time (takeoff) in `HH:MM:SS` format.
-- **GPS-Arming-Lat**: Latitude at the moment of arming (currently set to `0.000000`).
-- **GPS-Arming-Lon**: Longitude at the moment of arming (currently set to `0.000000`).
+- **GPS-Arming-Lat**: Latitude at the moment of arming.
+- **GPS-Arming-Lon**: Longitude at the moment of arming.
 - **Disarming**: A constant text field ("Disarming").
 - **Timestamp-LDG**: The disarming time (landing) in `HH:MM:SS` format.
-- **GPS-Disarming-Lat**: Latitude at the moment of disarming (currently set to `0.000000`).
-- **GPS-Disarming-Lon**: Longitude at the moment of disarming (currently set to `0.000000`).
+- **GPS-Disarming-Lat**: Latitude at the moment of disarming.
+- **GPS-Disarming-Lon**: Longitude at the moment of disarming.
 - **Duration**: The flight duration in seconds.
 - **ModelName**: The name of the model used during the flight.
 
-*Note:* The GPS coordinate fields are placeholders (set to zero) in this example. They can be updated to include real-time GPS data if available.
+### tellog.lua
+
+Each session creates a CSV file with columns:
+
+```
+time,GPS_numSat,GPS_coord[0],GPS_coord[1],GPS_altitude,GPS_speed,GPS_ground_course,VSpd,Pitch,Roll,Yaw,RxBt,Curr,Capa,RQly,TQly,TPWR,Ail,Ele,Thr,Rud
+```
+
+- **time**: Time since power-on (in 10ms units)
+- **GPS_numSat**: Number of GPS satellites
+- **GPS_coord[0]**: Latitude
+- **GPS_coord[1]**: Longitude
+- **GPS_altitude**: Altitude
+- **GPS_speed**: Ground speed
+- **GPS_ground_course**: Heading/course
+- **VSpd**: Vertical speed
+- **Pitch, Roll, Yaw**: Attitude angles
+- **RxBt**: Receiver battery voltage
+- **Curr**: Current (A)
+- **Capa**: Consumed capacity (mAh)
+- **RQly, TQly**: RF link quality
+- **TPWR**: Transmit power
+- **Ail, Ele, Thr, Rud**: Stick positions
+
+#### Example Output
+
+```
+time,GPS_numSat,GPS_coord[0],GPS_coord[1],GPS_altitude,GPS_speed,GPS_ground_course,VSpd,Pitch,Roll,Yaw,RxBt,Curr,Capa,RQly,TQly,TPWR,Ail,Ele,Thr,Rud
+821470000,14,47.1846924,8.6641636,0,0.40,235.5,-10.00,0.1,0.1,2.8,7.20,0.70,248,100,100,25,13.00,6.00,-1024.00,-6.00
+821620000,14,47.1846924,8.6641636,0,0.40,235.5,-11.00,0.1,0.1,2.8,7.20,0.70,248,100,100,25,11.00,7.00,-1024.00,-9.00
+... (more rows)
+```
 
 ## License
 
@@ -59,6 +136,6 @@ This project is licensed under the **MIT License**.
 
 ## Notes
 
-- The script automatically creates the `flylog.csv` file if it does not exist.
+- Both scripts automatically create their log files if they do not exist.
 - Ensure that your radio has logging enabled and sufficient storage for logs.
-- The script uses `getDateTime()` to log accurate timestamps.
+- The scripts use `getDateTime()` and telemetry fields to log accurate data.
