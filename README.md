@@ -38,6 +38,7 @@ This repository contains two Lua scripts for EdgeTX transmitters:
    5. Under **Value**, select `flylog.lua`.
    6. Set **Repeat** to **ON**.
    7. Make sure **Enable** is toggled on.
+   
       ![Printscreen 2: Enable Special Function](screenshots/2_special_functions.png)
 
    Refer to the provided screenshots for an example of how this is set up.
@@ -58,6 +59,7 @@ This repository contains two Lua scripts for EdgeTX transmitters:
    5. Under **Value**, select `tellog.lua`.
    6. Set **Repeat** to **ON**.
    7. Make sure **Enable** is toggled on.
+
       ![Printscreen 2: Enable Special Function](screenshots/2_special_functions.png)
 
    Refer to the provided screenshots for an example of how this is set up.
