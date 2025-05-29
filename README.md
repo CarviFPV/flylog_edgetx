@@ -32,11 +32,13 @@ This repository contains two Lua scripts for EdgeTX transmitters:
 
    1. On your EdgeTX transmitter, open the **Model** page and navigate to the **Special Functions** tab.
    2. Create a new special function (tap the `+` icon).
+      ![Printscreen 1: Special Function setup for flylog.lua](./Printscreen1.png)
    3. Under **Trigger**, select the switch you want to use to start/stop logging (e.g., your arming switch).
    4. Under **Function**, choose **Lua Script**.
    5. Under **Value**, select `flylog.lua`.
    6. Set **Repeat** to **ON**.
    7. Make sure **Enable** is toggled on.
+      ![Printscreen 2: Enable Special Function](./Printscreen2.png)
 
    Refer to the provided screenshots for an example of how this is set up.
 
@@ -50,11 +52,13 @@ This repository contains two Lua scripts for EdgeTX transmitters:
 
    1. On your EdgeTX transmitter, open the **Model** page and navigate to the **Special Functions** tab.
    2. Create a new special function (tap the `+` icon).
+      ![Printscreen 1: Special Function setup for flylog.lua](./Printscreen1.png)
    3. Under **Trigger**, select the switch you want to use to start/stop logging (e.g., your arming switch).
    4. Under **Function**, choose **Lua Script**.
    5. Under **Value**, select `tellog.lua`.
    6. Set **Repeat** to **ON**.
    7. Make sure **Enable** is toggled on.
+      ![Printscreen 2: Enable Special Function](./Printscreen2.png)
 
    Refer to the provided screenshots for an example of how this is set up.
 
