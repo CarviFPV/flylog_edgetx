@@ -5,6 +5,12 @@ This repository contains two Lua scripts for EdgeTX transmitters:
 - **flylog.lua**: Logs arming/disarming events, timestamps, GPS coordinates, and model name.
 - **tellog.lua**: Logs detailed telemetry data at regular intervals during flight.
 
+These log files can be managed and analyzed with the [UAV Manager](https://github.com/CarviFPV/UAV_Manager).
+
+![UAV Manager Flight Log](screenshots/flightlog.png)
+
+![UAV Manager Flight Details](screenshots/flightdetails.png)
+
 ## Features
 
 ### flylog.lua
@@ -38,7 +44,7 @@ This repository contains two Lua scripts for EdgeTX transmitters:
    5. Under **Value**, select `flylog.lua`.
    6. Set **Repeat** to **ON**.
    7. Make sure **Enable** is toggled on.
-   
+
       ![Printscreen 2: Enable Special Function](screenshots/2_special_functions.png)
 
    Refer to the provided screenshots for an example of how this is set up.
