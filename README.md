@@ -89,9 +89,9 @@ These log files can be managed and analyzed with the [UAV Manager](https://githu
       
    ![Edegtx Tools](screenshots/elrs_settings.png) 
       
-      1. Packet Ratio      = 250HZ
+   1. Packet Ratio      = 250HZ
       
-      2. Telemetry Ratio   = 8
+   2. Telemetry Ratio   = 8
       
       **Note:** The default Packet Ratio of 250Hz is fine, but the standard Telemetry Ratio is too high and should be set to 8. If you use a different Packet Ratio, you will need to find the best Telemetry Ratio for your setup, as it always depends on the Packet Ratio. If the Telemetry Ratio is too high, you will get less data, which can make the telemetry look messy in the UAV Manager when analyzing your flight data.
 
