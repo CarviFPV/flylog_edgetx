@@ -59,10 +59,15 @@ These log files can be managed and analyzed with the [UAV Manager](https://githu
 
    1. On your EdgeTX transmitter, open the **Model** page and navigate to the **Special Functions** tab.
    2. Create a new special function (tap the `+` icon).
+      
       ![Printscreen 1: Special Function setup for tellog.lua](screenshots/edge-tx_settings.png)
-      1) special functions
-      2) flylog.lua script
-      3) tellog.lua script
+      
+      1 special functions
+      
+      2 flylog.lua script
+      
+      3 tellog.lua script
+
    3. Under **Trigger**, select the switch you want to use to start/stop logging (e.g., your arming switch).
    4. Under **Function**, choose **Lua Script**.
    5. Under **Value**, select `tellog.lua`.
@@ -77,13 +82,18 @@ These log files can be managed and analyzed with the [UAV Manager](https://githu
 
    A. Click on SYS and go to the Tools tab.
    B. There you should see the ExpressLRS script.
-      ![Edegtx Tools](screenshots/edgetx-tools.png)
+      
+   ![Edegtx Tools](screenshots/edgetx-tools.png)
+   
    C. Then you should set the following:
-      ![Edegtx Tools](screenshots/elrs_settings.png)
+      
+   ![Edegtx Tools](screenshots/elrs_settings.png) 
+      
       1. Packet Ratio      = 250HZ
+      
       2. Telemetry Ratio   = 8
       
-      > **Note:** The default Packet Ratio of 250Hz is fine, but the standard Telemetry Ratio is too high and should be set to 8. If you use a different Packet Ratio, you will need to find the best Telemetry Ratio for your setup, as it always depends on the Packet Ratio. If the Telemetry Ratio is too high, you will get less data, which can make the telemetry look messy in the UAV Manager when analyzing your flight data.
+      **Note:** The default Packet Ratio of 250Hz is fine, but the standard Telemetry Ratio is too high and should be set to 8. If you use a different Packet Ratio, you will need to find the best Telemetry Ratio for your setup, as it always depends on the Packet Ratio. If the Telemetry Ratio is too high, you will get less data, which can make the telemetry look messy in the UAV Manager when analyzing your flight data.
 
 
 
