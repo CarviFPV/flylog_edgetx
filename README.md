@@ -5,11 +5,25 @@ This repository contains two Lua scripts for EdgeTX transmitters:
 - **flylog.lua**: Logs arming/disarming events, timestamps, GPS coordinates, and model name.
 - **tellog.lua**: Logs detailed telemetry data at regular intervals during flight.
 
-## UAV Manager
+## UAV Desk
 
 These log files can be managed and analyzed with the [UAV Desk](https://uavdesk.app).
 
-![UAV Desk Flight Details](screenshots/flightdetails.png)
+### Overview — Quick tour 🚀
+
+A short, grouped view of the main UI areas of `UAV Desk` (screenshots are in the `screenshots/` folder).
+
+| Area | Screenshot(s) | Short description |
+|---|---|---|
+| Flight Logs — list view | ![Flight Logs — list view (light)](screenshots/2_flightlogs_light.png) | Log list with filters, date/time, duration, actions |
+| Reports — trends & KPIs | ![Monthly Flight Trend](screenshots/3_report_trends.png) <br> ![Flight Reports — overview (dark)](screenshots/3_reports.png) | Monthly trends, KPI cards and aggregate reports |
+| UAV Management | ![UAV Management — aircraft list & details](screenshots/4_UAV_Managment_dark.png) | Aircraft overview, details and status management |
+| Configuration & maintenance | ![Config diff viewer](screenshots/5_diff_black.png) <br> ![Configuration files & maintenance logs](screenshots/6_uav_files.png) | Config comparison, upload/download and maintenance logs |
+| Flight Details | ![Flight Details](screenshots/flightdetails.png) | Detail view of a single flight record |
+
+---
+
+## Features
 
 ## Features
 
