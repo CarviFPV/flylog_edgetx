@@ -7,9 +7,9 @@ This repository contains two Lua scripts for EdgeTX transmitters:
 
 ## UAV Manager
 
-These log files can be managed and analyzed with the [UAV Manager](https://github.com/CarviFPV/UAV_Manager).
+These log files can be managed and analyzed with the [UAV Desk](https://uavdesk.app).
 
-![UAV Manager Flight Details](screenshots/flightdetails.png)
+![UAV Desk Flight Details](screenshots/flightdetails.png)
 
 ## Features
 
